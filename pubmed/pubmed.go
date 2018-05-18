@@ -1,12 +1,15 @@
 package pubmed
 
 import (
-	"time"
-	"log"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
+	"math"
 	"net/http"
 	"strconv"
+	"time"
+
+	"github.com/pkg/errors"
 )
 
 // SearchURL and query parameters
@@ -19,27 +22,28 @@ const querySearchTerm = "&term=%v"
 // FetchURL is the endpoint that fetches a single pubmed article by id
 const FetchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=abstract&id="
 
-var httpClient = &http.Client{Timeout: 90 * time.Second}
+const defaultSearchName = "Pubmed Search"
+const defaultBackDays = 7
+const defaultMaxSetSize = 1000
 
-// Search represents the search being done at pubmed
+// Search represents the Pubmed query
 type Search struct {
-	Category string
-	Term     string
+	Name     string
 	BackDays int
-	Count    int
-	Response response
+	Term     string
+	Result   Result
 }
 
-// response maps the fields in the response from pubmed
-type response struct {
-	Header map[string]string `json:"header"`
-	Result result            `json:"esearchresult"`
+// Result of the Search where MaxSetSize determines the maximum number of IDs that can be stored in each set.
+type Result struct {
+	Total      int
+	MaxSetSize int
+	Sets       []Set
 }
 
-// result maps the esearchresult field in the response
-type result struct {
-	Count string   `json:"count"`
-	IDs   []string `json:"idlist"`
+// Set is a set of article IDs returns from the Search
+type Set struct {
+	IDs []string `json:"idlist"`
 }
 
 // PubMedSummary Result - each result is indexed by the id of the record requested, even if there is only one.
@@ -98,33 +102,139 @@ type Resource struct {
 	Attributes  map[string]interface{} `json:"attributes"`
 }
 
-func NewSearch() *Search {
-	return &Search{}
+// NewSearch returns a pointer to a Search with some defaults set
+func NewSearch(query string) *Search {
+	return &Search{
+		Name:     defaultSearchName,
+		BackDays: defaultBackDays,
+		Term:     query,
+		Result: Result{
+			MaxSetSize: defaultMaxSetSize,
+		},
+	}
 }
 
-// SetCount runs the pubmed query with rettype=count to get the total article count for the search term.
-func (ps *Search) SetCount() error {
+// Query runs the pubmed query
+func (ps *Search) Query() error {
 
-	var c = struct {
-		Result map[string]string `json:"esearchresult"`
-	}{}
+	err := ps.QueryResultTotal()
+	if err != nil {
+		return err
+	}
+
+	c := ps.NumSets()
+	for i := 0; i < c; i++ {
+		set, err := ps.QueryResultSet(i)
+		if err != nil {
+			return err
+		}
+		ps.Result.Sets = append(ps.Result.Sets, set)
+	}
+
+	for i, v := range ps.Result.Sets {
+		fmt.Println("Set #", i, len(v.IDs))
+	}
+
+	return nil
+}
+
+//
+func (ps *Search) QueryResultTotal() error {
 
 	url := SearchURL + fmt.Sprintf(queryBackDays+querySearchTerm, ps.BackDays, ps.Term) + "&rettype=count"
+
+	xb, err := ResponseBody(url)
+	if err != nil {
+		return errors.Wrap(err, "QueryResultTotal could not get response body")
+	}
+
+	ps.Result.Total, err = ResultsCount(xb)
+	if err != nil {
+		return errors.Wrap(err, "QueryResultTotal could not extract count from response body")
+	}
+
+	return nil
+}
+
+//
+func (ps *Search) QueryResultSet(setIndex int) (Set, error) {
+
+	var resultSet Set
+
+	startIndex := setIndex * ps.Result.MaxSetSize
+
+	url := SearchURL +
+		fmt.Sprintf(queryBackDays, ps.BackDays) +
+		fmt.Sprintf(queryStartIndex, startIndex) +
+		fmt.Sprintf(queryReturnMax, ps.Result.MaxSetSize) +
+		fmt.Sprintf(querySearchTerm, ps.Term)
+
+	xb, err := ResponseBody(url)
+	if err != nil {
+		return resultSet, errors.Wrap(err, "QueryResultSet could not get response body")
+	}
+
+	resultSet.IDs, err = ResultsSetIDs(xb)
+	if err != nil {
+		return resultSet, errors.Wrap(err, "QueryResultTotal could not extract count from response body")
+	}
+
+	return resultSet, nil
+}
+
+func ResponseBody(url string) ([]byte, error) {
+
+	httpClient := &http.Client{Timeout: 90 * time.Second}
+
 	r, err := httpClient.Get(url)
 	if err != nil {
-		log.Fatalln(err)
+		return nil, errors.Wrap(err, "ResponseBody")
 	}
 	defer r.Body.Close()
 
-	err = json.NewDecoder(r.Body).Decode(&c)
+	return ioutil.ReadAll(r.Body)
+}
+
+// extract the count value from response body
+func ResultsCount(responseBody []byte) (int, error) {
+
+	var r = struct {
+		Result struct {
+			Count string `json:"count"`
+		} `json:"esearchresult"`
+	}{}
+
+	err := json.Unmarshal(responseBody, &r)
 	if err != nil {
-		log.Fatalln(err)
-	}
-	count, err := strconv.Atoi(c.Result["count"])
-	if err != nil {
-		log.Fatalln(err)
+		return 0, errors.Wrap(err, "Unmarshal")
 	}
 
-	ps.Count = count
-	return nil
+	count, err := strconv.Atoi(r.Result.Count)
+	if err != nil {
+		return 0, errors.Wrap(err, "Atoi")
+	}
+
+	return count, nil
+}
+
+// extract the sets from response body
+func ResultsSetIDs(responseBody []byte) ([]string, error) {
+
+	var r = struct {
+		Result struct {
+			IDList []string `json:"idlist"`
+		} `json:"esearchresult"`
+	}{}
+
+	err := json.Unmarshal(responseBody, &r)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Unmarshal")
+	}
+
+	return r.Result.IDList, nil
+}
+
+// NumSets calculates the number of sets required for a Search based on MaxSetSize and total results.
+func (ps *Search) NumSets() int {
+	return int(math.Ceil(float64(ps.Result.Total) / float64(ps.Result.MaxSetSize)))
 }

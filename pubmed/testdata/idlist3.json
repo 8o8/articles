@@ -1,0 +1,422 @@
+{
+  "header": {
+    "type": "esearch",
+    "version": "0.3"
+  },
+  "esearchresult": {
+    "count": "2070",
+    "retmax": "70",
+    "retstart": "2000",
+    "idlist": [
+      "28300081",
+      "28298457",
+      "28296139",
+      "28292588",
+      "28291676",
+      "28285270",
+      "28285269",
+      "28280146",
+      "28279971",
+      "28279745",
+      "28274566",
+      "28270427",
+      "28259695",
+      "28258243",
+      "28255098",
+      "28249992",
+      "28246175",
+      "28242047",
+      "28237970",
+      "28232261",
+      "28228467",
+      "28219848",
+      "28219635",
+      "28215569",
+      "28204458",
+      "28189359",
+      "28185348",
+      "28180237",
+      "28177451",
+      "28169883",
+      "28169880",
+      "28165125",
+      "28158489",
+      "28131666",
+      "28122793",
+      "28115473",
+      "28109928",
+      "28093268",
+      "28082330",
+      "28065909",
+      "28034583",
+      "28017389",
+      "28017386",
+      "28017384",
+      "28011803",
+      "28011703",
+      "28008698",
+      "28007619",
+      "28003419",
+      "27943554",
+      "27941016",
+      "27928880",
+      "27890771",
+      "27885047",
+      "27789562",
+      "27771398",
+      "27743954",
+      "27705888",
+      "27702861",
+      "27702855",
+      "27702852",
+      "27585715",
+      "27550660",
+      "27485141",
+      "27461207",
+      "27436868",
+      "27411361",
+      "27311731",
+      "27189954",
+      "28339581"
+    ],
+    "translationset": [],
+    "translationstack": [{
+      "term": "loattrfree full text[Filter]",
+      "field": "Filter",
+      "count": "6530840",
+      "explode": "N"
+    },
+      {
+        "term": "\"Am Heart J\"[jour]",
+        "field": "jour",
+        "count": "23962",
+        "explode": "N"
+      },
+      {
+        "term": "\"Am J Cardiol\"[jour]",
+        "field": "jour",
+        "count": "36210",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Arterioscler Thromb Vasc Biol\"[jour]",
+        "field": "jour",
+        "count": "8737",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Atherosclerosis\"[jour]",
+        "field": "jour",
+        "count": "13221",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Basic Res Cardiol\"[jour]",
+        "field": "jour",
+        "count": "3465",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Cardiovasc Res\"[jour]",
+        "field": "jour",
+        "count": "10424",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Chest\"[jour]",
+        "field": "jour",
+        "count": "33601",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circulation\"[jour]",
+        "field": "jour",
+        "count": "42628",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Arrhythm Electrophysiol\"[jour]",
+        "field": "jour",
+        "count": "1746",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Cardiovasc Genet\"[jour]",
+        "field": "jour",
+        "count": "956",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Cardiovasc Imaging\"[jour]",
+        "field": "jour",
+        "count": "1398",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Cardiovasc Qual Outcomes\"[jour]",
+        "field": "jour",
+        "count": "1196",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Cardiovasc Interv\"[jour]",
+        "field": "jour",
+        "count": "1324",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Heart Fail\"[jour]",
+        "field": "jour",
+        "count": "1340",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Circ Res\"[jour]",
+        "field": "jour",
+        "count": "16950",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"ESC Heart Fail\"[jour]",
+        "field": "jour",
+        "count": "277",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur Heart J\"[jour]",
+        "field": "jour",
+        "count": "16730",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur Heart J Cardiovasc Imaging\"[jour]",
+        "field": "jour",
+        "count": "1884",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur Heart J Acute Cardiovasc Care\"[jour]",
+        "field": "jour",
+        "count": "550",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur Heart J Cardiovasc Pharmacother\"[jour]",
+        "field": "jour",
+        "count": "180",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur Heart J Qual Care Clin Outcomes\"[jour]",
+        "field": "jour",
+        "count": "159",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur J Heart Fail\"[jour]",
+        "field": "jour",
+        "count": "3288",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Eur J Vasc Endovasc Surg\"[jour]",
+        "field": "jour",
+        "count": "6011",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Europace\"[jour]",
+        "field": "jour",
+        "count": "5026",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Heart\"[jour]",
+        "field": "jour",
+        "count": "9924",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Heart Lung Circ\"[jour]",
+        "field": "jour",
+        "count": "2565",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Heart Rhythm\"[jour]",
+        "field": "jour",
+        "count": "5327",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"JACC Cardiovasc Interv\"[jour]",
+        "field": "jour",
+        "count": "3441",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"JACC Cardiovasc Imaging\"[jour]",
+        "field": "jour",
+        "count": "2499",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"JACC Heart Fail\"[jour]",
+        "field": "jour",
+        "count": "842",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Am Coll Cardiol\"[jour]",
+        "field": "jour",
+        "count": "24467",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Am Heart Assoc\"[jour]",
+        "field": "jour",
+        "count": "3084",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Am Soc Echocardiogr\"[jour]",
+        "field": "jour",
+        "count": "5279",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Card Fail\"[jour]",
+        "field": "jour",
+        "count": "2517",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Cardiovasc Electrophysiol\"[jour]",
+        "field": "jour",
+        "count": "6216",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Cardiovasc Magn Reson\"[jour]",
+        "field": "jour",
+        "count": "1323",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Heart Lung Transplant\"[jour]",
+        "field": "jour",
+        "count": "6297",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Hypertens\"[jour]",
+        "field": "jour",
+        "count": "9886",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Mol Cell Cardiol\"[jour]",
+        "field": "jour",
+        "count": "7992",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Thorac Cardiovasc Surg\"[jour]",
+        "field": "jour",
+        "count": "25638",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"J Vasc Surg\"[jour]",
+        "field": "jour",
+        "count": "13927",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Nat Rev Cardiol\"[jour]",
+        "field": "jour",
+        "count": "1820",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Prog Cardiovasc Dis\"[jour]",
+        "field": "jour",
+        "count": "2126",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Resuscitation\"[jour]",
+        "field": "jour",
+        "count": "7099",
+        "explode": "N"
+      },
+      "OR",
+      {
+        "term": "\"Stroke\"[jour]",
+        "field": "jour",
+        "count": "19094",
+        "explode": "N"
+      },
+      "OR",
+      "GROUP",
+      "AND",
+      {
+        "term": "2017/05/17[PDAT]",
+        "field": "PDAT",
+        "count": "0",
+        "explode": "N"
+      },
+      {
+        "term": "2018/05/17[PDAT]",
+        "field": "PDAT",
+        "count": "0",
+        "explode": "N"
+      },
+      "RANGE",
+      "AND"
+    ],
+    "querytranslation": "loattrfree full text[Filter] AND (\"Am Heart J\"[jour] OR \"Am J Cardiol\"[jour] OR \"Arterioscler Thromb Vasc Biol\"[jour] OR \"Atherosclerosis\"[jour] OR \"Basic Res Cardiol\"[jour] OR \"Cardiovasc Res\"[jour] OR \"Chest\"[jour] OR \"Circulation\"[jour] OR \"Circ Arrhythm Electrophysiol\"[jour] OR \"Circ Cardiovasc Genet\"[jour] OR \"Circ Cardiovasc Imaging\"[jour] OR \"Circ Cardiovasc Qual Outcomes\"[jour] OR \"Circ Cardiovasc Interv\"[jour] OR \"Circ Heart Fail\"[jour] OR \"Circ Res\"[jour] OR \"ESC Heart Fail\"[jour] OR \"Eur Heart J\"[jour] OR \"Eur Heart J Cardiovasc Imaging\"[jour] OR \"Eur Heart J Acute Cardiovasc Care\"[jour] OR \"Eur Heart J Cardiovasc Pharmacother\"[jour] OR \"Eur Heart J Qual Care Clin Outcomes\"[jour] OR \"Eur J Heart Fail\"[jour] OR \"Eur J Vasc Endovasc Surg\"[jour] OR \"Europace\"[jour] OR \"Heart\"[jour] OR \"Heart Lung Circ\"[jour] OR \"Heart Rhythm\"[jour] OR \"JACC Cardiovasc Interv\"[jour] OR \"JACC Cardiovasc Imaging\"[jour] OR \"JACC Heart Fail\"[jour] OR \"J Am Coll Cardiol\"[jour] OR \"J Am Heart Assoc\"[jour] OR \"J Am Soc Echocardiogr\"[jour] OR \"J Card Fail\"[jour] OR \"J Cardiovasc Electrophysiol\"[jour] OR \"J Cardiovasc Magn Reson\"[jour] OR \"J Heart Lung Transplant\"[jour] OR \"J Hypertens\"[jour] OR \"J Mol Cell Cardiol\"[jour] OR \"J Thorac Cardiovasc Surg\"[jour] OR \"J Vasc Surg\"[jour] OR \"Nat Rev Cardiol\"[jour] OR \"Prog Cardiovasc Dis\"[jour] OR \"Resuscitation\"[jour] OR \"Stroke\"[jour]) AND 2017/05/17[PDAT] : 2018/05/17[PDAT]"
+  }
+}
