@@ -4,49 +4,39 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"net/http"
 	"strconv"
 	"time"
+	"strings"
+	"net/url"
 
 	"github.com/pkg/errors"
 )
 
 // SearchURL and query parameters
-const SearchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json"
+const SearchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi?db=pubmed&retmode=json&usehistory=y"
 const queryReturnMax = "&retmax=%v"
 const queryStartIndex = "&retstart=%v"
 const queryBackDays = "&reldate=%v&datetype=pdat"
 const querySearchTerm = "&term=%v"
 
-// FetchURL is the endpoint that fetches a single pubmed article by id
-const FetchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=abstract&id="
+// FetchURL fetches articles
+const FetchURL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&rettype=abstract&query_key=1&WebEnv=NCID_1_94625809_130.14.18.34_9001_1527039838_862671551_0MetA0_S_MegaStore"
 
-const defaultSearchName = "Pubmed Search"
 const defaultBackDays = 7
 const defaultMaxSetSize = 1000
 
-// Search represents the Pubmed query
+// Search represents a request to the Pubmed esearch endpoint and results in one or more sets of article IDs which
+// can be subsequently used to fetch article summaries.
 type Search struct {
-	Name     string
-	BackDays int
-	Term     string
-	Result   Result
+	BackDays    int
+	Term        string
+	ResultCount int
+	QueryKey    string `json:"querykey"`
+	WebEnv      string `json:"webenv"`
 }
 
-// Result of the Search where MaxSetSize determines the maximum number of IDs that can be stored in each set.
-type Result struct {
-	Total      int
-	MaxSetSize int
-	Sets       []Set
-}
-
-// Set is a set of article IDs returns from the Search
-type Set struct {
-	IDs []string `json:"idlist"`
-}
-
-// PubMedSummary Result - each result is indexed by the id of the record requested, even if there is only one.
+// PubMedSummary result - each result is indexed by the id of the record requested, even if there is only one.
 // As we can pass multiple ids on the URL to save requests eg 521345,765663,121234,3124256
 // use XMl to fetch this as easier to get to nested data
 type PubMedArticleSet struct {
@@ -105,90 +95,96 @@ type Resource struct {
 // NewSearch returns a pointer to a Search with some defaults set
 func NewSearch(query string) *Search {
 	return &Search{
-		Name:     defaultSearchName,
 		BackDays: defaultBackDays,
 		Term:     query,
-		Result: Result{
-			MaxSetSize: defaultMaxSetSize,
-		},
 	}
-}
-
-// Query runs the pubmed query
-func (ps *Search) Query() error {
-
-	err := ps.QueryResultTotal()
-	if err != nil {
-		return err
-	}
-
-	c := ps.NumSets()
-	for i := 0; i < c; i++ {
-		set, err := ps.QueryResultSet(i)
-		if err != nil {
-			return err
-		}
-		ps.Result.Sets = append(ps.Result.Sets, set)
-	}
-
-	for i, v := range ps.Result.Sets {
-		fmt.Println("Set #", i, len(v.IDs))
-	}
-
-	return nil
 }
 
 //
-func (ps *Search) QueryResultTotal() error {
+func (ps *Search) StoreResults() error {
 
-	url := SearchURL + fmt.Sprintf(queryBackDays+querySearchTerm, ps.BackDays, ps.Term) + "&rettype=count"
-
-	xb, err := ResponseBody(url)
-	if err != nil {
-		return errors.Wrap(err, "QueryResultTotal could not get response body")
-	}
-
-	ps.Result.Total, err = ResultsCount(xb)
-	if err != nil {
-		return errors.Wrap(err, "QueryResultTotal could not extract count from response body")
-	}
-
-	return nil
-}
-
-//
-func (ps *Search) QueryResultSet(setIndex int) (Set, error) {
-
-	var resultSet Set
-
-	startIndex := setIndex * ps.Result.MaxSetSize
-
-	url := SearchURL +
+	sURL := SearchURL +
 		fmt.Sprintf(queryBackDays, ps.BackDays) +
-		fmt.Sprintf(queryStartIndex, startIndex) +
-		fmt.Sprintf(queryReturnMax, ps.Result.MaxSetSize) +
 		fmt.Sprintf(querySearchTerm, ps.Term)
 
-	xb, err := ResponseBody(url)
+	xb, err := ResponseGET(sURL)
 	if err != nil {
-		return resultSet, errors.Wrap(err, "QueryResultSet could not get response body")
+		return errors.Wrap(err, "StoreResults")
 	}
 
-	resultSet.IDs, err = ResultsSetIDs(xb)
+	var r = struct {
+		Result struct {
+			Count    string `json:"count"`
+			QueryKey string `json:"querykey"`
+			WebEnv   string `json:"webenv"`
+		} `json:"esearchresult"`
+	}{}
+
+	err = json.Unmarshal(xb, &r)
 	if err != nil {
-		return resultSet, errors.Wrap(err, "QueryResultTotal could not extract count from response body")
+		return errors.Wrap(err, "StoreResults, Unmarshal")
 	}
 
-	return resultSet, nil
+	count, err := strconv.Atoi(r.Result.Count)
+	if err != nil {
+		return errors.Wrap(err, "StoreResults, Atoi")
+	}
+	ps.ResultCount = count
+
+	ps.QueryKey = r.Result.QueryKey
+	ps.WebEnv = r.Result.WebEnv
+
+	return nil
 }
 
-func ResponseBody(url string) ([]byte, error) {
+// QueryArticles fetches a set of Pubmed article summaries and unmarshals them into a PubMedSet.
+// There is no limited to the number of article that may be requested however it is recommended to use the POST method
+// for requests of more than 200 articles. The list of article ids is posted as form data in the body of the request.
+// Ref: https://www.ncbi.nlm.nih.gov/books/NBK25499/#_chapter4_EFetch_
+func (ps *Search) QueryArticles(ids ...string) ([]PubMedArticle, error) {
+
+	var xpa []PubMedArticle
+
+	form := url.Values{}
+	form.Add("ids", strings.Join(ids, ","))
+
+	xb, err := ResponsePOST(FetchURL, form)
+	if err != nil {
+		return xpa, errors.Wrap(err, "QueryArticles could not get response body")
+	}
+
+	fmt.Println(string(xb))
+
+	//resultSet.IDs, err = ResultsSetIDs(xb)
+	//if err != nil {
+	//	return resultSet, errors.Wrap(err, "QueryArticles could not extract count from response body")
+	//}
+
+	return nil, nil
+}
+
+// ResponseGET returns the response body from a GET request
+func ResponseGET(url string) ([]byte, error) {
 
 	httpClient := &http.Client{Timeout: 90 * time.Second}
 
 	r, err := httpClient.Get(url)
 	if err != nil {
-		return nil, errors.Wrap(err, "ResponseBody")
+		return nil, errors.Wrap(err, "ResponseGET")
+	}
+	defer r.Body.Close()
+
+	return ioutil.ReadAll(r.Body)
+}
+
+// ResponsePOST returns the response body from a POST request
+func ResponsePOST(url string, data url.Values) ([]byte, error) {
+
+	httpClient := &http.Client{Timeout: 90 * time.Second}
+
+	r, err := httpClient.PostForm(url, data)
+	if err != nil {
+		return nil, errors.Wrap(err, "ResponseGET")
 	}
 	defer r.Body.Close()
 
@@ -217,7 +213,7 @@ func ResultsCount(responseBody []byte) (int, error) {
 	return count, nil
 }
 
-// extract the sets from response body
+// ResultsSetIDs extracts the list of ids from the JSON response body
 func ResultsSetIDs(responseBody []byte) ([]string, error) {
 
 	var r = struct {
@@ -235,6 +231,6 @@ func ResultsSetIDs(responseBody []byte) ([]string, error) {
 }
 
 // NumSets calculates the number of sets required for a Search based on MaxSetSize and total results.
-func (ps *Search) NumSets() int {
-	return int(math.Ceil(float64(ps.Result.Total) / float64(ps.Result.MaxSetSize)))
-}
+//func (ps *Search) NumSets() int {
+//	return int(math.Ceil(float64(ps.Result.Total) / float64(ps.Result.MaxSetSize)))
+//}
