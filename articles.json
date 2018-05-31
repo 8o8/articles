@@ -1,0 +1,26 @@
+{
+  "_id": 29446254,
+  "url": "https://doi.org/10.1002/ehf2.12262",
+  "title": "Heart failure: a weak link in CHA DS -VASc.",
+  "description": "In atrial fibrillation, stroke risk is assessed by the CHA DS -VASc score. Heart failure is included in CHA DS -VASc, but the rationale is uncertain. Our objective was to test if heart failure is a risk factor for stroke, independent of other risk factors in CHA DS -VASc.",
+  "keywords": [
+    "Anticoagulation",
+    "Atrial fibrillation",
+    "Epidemiology",
+    "Heart failure",
+    "Register",
+    "Stroke",
+    "Friberg L",
+    "Lund LH"
+  ],
+  "categories": [
+    "Cardiology"
+  ],
+  "publication": {
+    "time": 1527811200,
+    "date": "2018-06-01T00:00:00Z",
+    "name": "ESC heart failure",
+    "abbrev": "ESC Heart Fail",
+    "pages": "231-239"
+  }
+}
